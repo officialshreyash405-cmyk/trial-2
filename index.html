@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow"> <!-- keeps this private page out of Google -->
+  <meta name="theme-color" content="#12060d">
+  <title>Happy Birthday, Ananya | A little surprise from Shreyash</title>
+
+  <!-- Fonts: Playfair Display (headings), Poppins (text), Caveat (handwriting) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Poppins:wght@300;400;500;600&display=swap">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ===== Background: glow, grain, edge shadow, falling petals (canvas) ===== -->
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <canvas class="sky" id="sky" aria-hidden="true"></canvas>
+
+
+  <!-- Thin progress line at the very top -->
+  <div class="chapter-progress" id="chapterProgress" aria-hidden="true"><i></i></div>
+
+  <!-- Soft fade + heart shown while moving between pages -->
+  <div class="veil" id="veil" aria-hidden="true"></div>
+
+
+  <!-- ===== Menu button (top left, appears after the PIN) ===== -->
+  <button class="menu-btn" id="menuBtn" type="button"
+          aria-label="Open menu" aria-expanded="false" aria-controls="menuPanel" hidden>
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Menu panel (opens with a circle reveal; items are created by script.js) -->
+  <div class="menu-panel" id="menuPanel" aria-hidden="true" inert>
+    <div class="menu-inner">
+      <p class="menu-title">Ananya <i>♡</i> Shreyash</p>
+      <p class="menu-sub">A little birthday world · made just for you</p>
+      <ul class="menu-list" id="menuList"></ul>
+    </div>
+  </div>
+
+
+  <!-- ===== Music controls (top right) ===== -->
+  <div class="music-dock" id="musicDock">
+    <button class="music-toggle" id="musicToggle" type="button" aria-label="Toggle background music">
+      <span id="musicIcon">♪</span>
+    </button>
+    <button class="track-toggle" id="trackToggle" type="button" aria-label="Choose song">Songs</button>
+    <div class="track-panel" id="trackPanel" hidden></div>
+  </div>
+
+  <!-- Small skip button, only visible while the letter is being typed -->
+  <button class="skip-corner" id="skipLetterBtn" type="button" hidden>Skip ⏭</button>
+
+
+  <!-- ===== Back / Next buttons (bottom corners, appear after the PIN) ===== -->
+  <div class="corner-nav" id="cornerNav" hidden>
+    <button class="corner-btn corner-prev" id="prevBtn" type="button" aria-label="Previous page">
+      <span aria-hidden="true">←</span>
+    </button>
+    <button class="corner-btn corner-next" id="nextBtn" type="button">
+      <span id="nextLabel">Next</span>
+      <span class="corner-arrow" aria-hidden="true">→</span>
+    </button>
+  </div>
+
+  <!-- ===== Memory style dock (small button on the right, above Next; only on the memory page) ===== -->
+  <div class="wall-style-dock" id="wallStyleDock" hidden>
+    <button class="wall-style-toggle" id="wallStyleToggle" type="button"
+            aria-haspopup="true" aria-expanded="false" aria-controls="wallStylePanel" aria-label="Memory style">
+      <span aria-hidden="true">✦</span>
+    </button>
+
+    <div class="wall-style-panel" id="wallStylePanel" hidden>
+      <div class="wall-style-group">
+        <span class="wall-style-label">View</span>
+        <div class="wall-toggle" id="wallViewToggle" role="group" aria-label="Memory wall view">
+          <button type="button" class="wall-toggle-btn" data-view="wall">Wall</button>
+          <button type="button" class="wall-toggle-btn is-active" data-view="reel">Reel</button>
+          <button type="button" class="wall-toggle-btn" data-view="stack">Stack</button>
+          <button type="button" class="wall-toggle-btn" data-view="cover">Cover</button>
+          <button type="button" class="wall-toggle-btn" data-view="scatter">Scatter</button>
+          <button type="button" class="wall-toggle-btn" data-view="film">Film</button>
+        </div>
+      </div>
+
+      <div class="wall-style-group">
+        <span class="wall-style-label">Speed</span>
+        <div class="wall-toggle" id="wallSpeedToggle" role="group" aria-label="Animation speed">
+          <button type="button" class="wall-toggle-btn" data-speed="slow">Slow</button>
+          <button type="button" class="wall-toggle-btn is-active" data-speed="normal">Normal</button>
+          <button type="button" class="wall-toggle-btn" data-speed="fast">Fast</button>
+        </div>
+      </div>
+
+      <div class="wall-style-group" id="wallEffectGroup" hidden>
+        <span class="wall-style-label">Wall animation</span>
+        <div class="wall-toggle" id="wallEffectToggle" role="group" aria-label="Wall entrance effect">
+          <button type="button" class="wall-toggle-btn is-active" data-effect="cascade">Cascade</button>
+          <button type="button" class="wall-toggle-btn" data-effect="flip">Flip</button>
+          <button type="button" class="wall-toggle-btn" data-effect="zoom">Zoom</button>
+          <button type="button" class="wall-toggle-btn" data-effect="slide">Slide</button>
+          <button type="button" class="wall-toggle-btn" data-effect="rain">Rain</button>
+          <button type="button" class="wall-toggle-btn" data-effect="twirl">Twirl</button>
+          <button type="button" class="wall-toggle-btn" data-effect="blur">Blur</button>
+          <button type="button" class="wall-toggle-btn" data-effect="tumble">Tumble</button>
+        </div>
+      </div>
+
+      <div class="wall-style-group" id="reelEffectGroup">
+        <span class="wall-style-label">Reel animation</span>
+        <div class="wall-toggle" id="reelEffectToggle" role="group" aria-label="Reel animation">
+          <button type="button" class="wall-toggle-btn is-active" data-reel="upload">Upload</button>
+          <button type="button" class="wall-toggle-btn" data-reel="fade">Fade</button>
+          <button type="button" class="wall-toggle-btn" data-reel="slide">Slide</button>
+          <button type="button" class="wall-toggle-btn" data-reel="zoom">Zoom</button>
+          <button type="button" class="wall-toggle-btn" data-reel="flip">Flip</button>
+          <button type="button" class="wall-toggle-btn" data-reel="drift">Drift</button>
+          <button type="button" class="wall-toggle-btn" data-reel="drop">Drop</button>
+          <button type="button" class="wall-toggle-btn" data-reel="swing">Swing</button>
+          <button type="button" class="wall-toggle-btn" data-reel="spin">Spin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <main>
+
+    <!-- 1. OPENING: hero photo + PIN lock -->
+    <section class="scene opening active" id="opening" data-scene="opening">
+      <div class="hero-media">
+        <img id="heroImage" src="gift/i17.png" alt="Ananya">
+      </div>
+
+      <div class="opening-copy">
+        <p class="eyebrow">A little birthday surprise · just for you</p>
+        <h1>Happy<br><span>Birthday, Ananya.</span></h1>
+        <p class="nickname" aria-hidden="true">meri <b id="nickname">Babbyy</b> ♡</p>
+        <p class="lede">Ek chhoti si birthday world — tumhari photos, meri wishes, ek letter aur ek chhota sa surprise. 🎂</p>
+
+        <div class="pin-card" aria-label="Private PIN lock">
+          <p class="pin-title">Private little world</p>
+          <div class="pin-dots" id="pinDots" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <p class="pin-hint" id="pinHint">4 numbers. Formula secret hai — sirf hum dono jaante hain. Dimaag laga lena. 🔐</p>
+          <div class="keypad" id="keypad"></div> <!-- keys are created by script.js -->
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 2. LETTER: envelope opens, the letter rises out and is typed -->
+    <section class="scene letter-scene" id="letter" data-scene="letter">
+      <div class="scene-head">
+        <p class="eyebrow">Meri birthday girl ke naam.</p>
+        <h2>Open your birthday letter</h2>
+      </div>
+
+      <div class="letter-stage" id="letterStage">
+        <div class="envelope-wrap">
+          <button class="envelope" id="envelope" type="button" aria-label="Open my letter">
+            <span class="env-back"></span>
+            <span class="env-letter"></span>
+            <span class="env-flap"></span>
+            <span class="env-front"></span>
+            <span class="seal">♡</span>
+          </button>
+          <p class="tap-hint">tap the envelope</p>
+        </div>
+
+        <article class="letter-paper" id="letterPaper" aria-live="polite">
+          <div id="letterText"></div>
+        </article>
+      </div>
+    </section>
+
+
+    <!-- 3. TIMELINE (built by script.js) -->
+    <section class="scene timeline-scene" id="timeline" data-scene="timeline">
+      <div class="scene-head">
+        <p class="eyebrow">A few wishes for your new year.</p>
+        <h2>9 little birthday wishes.</h2>
+        <p>Tap a heart and open one wish at a time.</p>
+      </div>
+
+      <div class="timeline" id="timelineList"></div>
+    </section>
+
+
+    <!-- 4. MEMORY WALL (photos are created by script.js) -->
+    <section class="scene wall-scene" id="memoryWall" data-scene="memoryWall">
+      <div class="scene-head">
+        <p class="eyebrow">Birthday memory cinema.</p>
+        <h2>15 little memories, one birthday girl.</h2>
+        <p>Your favourite faces and little moments, one by one — fast, soft, and a little filmy.</p>
+      </div>
+
+      <div class="memory-controls">
+        <button class="primary" id="replayWallBtn" type="button">Replay memories</button>
+
+        <span>Tap any frame to open it.</span>
+      </div>
+
+      <div class="memory-grid" id="memoryGrid" hidden></div>
+
+      <!-- "Reel": one framed photo at a time. The WHOLE frame animates and takes the photo's shape. -->
+      <div class="memory-reel" id="memoryReel">
+        <div class="reel-stage" id="reelStage" data-effect="upload">
+          <div class="reel-progress" aria-hidden="true"><span id="reelProgressBar"></span></div>
+
+          <div class="reel-photo-wrap" id="reelPhotoWrap">
+            <img id="reelImg" alt="">
+            <div class="reel-uploading" id="reelUploading">
+              <span class="reel-spinner" aria-hidden="true"></span>
+              Loading photo <b id="reelUploadingNum">1</b>&hellip;
+            </div>
+          </div>
+
+          <span class="reel-index" id="reelIndexLabel">1 / 15</span>
+        </div>
+      </div>
+
+      <!-- "Stack": a pile of photos, the top one flies away -->
+      <div class="slide-view" id="memoryStack" hidden><div class="slide-stage stack-stage" id="stackStage"></div></div>
+
+      <!-- "Cover": 3D carousel -->
+      <div class="slide-view" id="memoryCover" hidden><div class="slide-stage cover-stage" id="coverStage"></div></div>
+
+      <!-- "Scatter": photos get dropped on a table one by one -->
+      <div class="slide-view" id="memoryScatter" hidden><div class="slide-stage scatter-stage" id="scatterStage"></div></div>
+
+      <!-- "Film": two endless film strips (built by script.js) -->
+      <div class="memory-film" id="memoryFilm" hidden></div>
+
+      <!-- Shared controls for Reel / Stack / Cover / Scatter -->
+      <div class="reel-nav" id="slideNav">
+        <button type="button" id="reelPrevBtn" aria-label="Previous photo">‹</button>
+        <button type="button" id="reelPlayBtn" aria-label="Pause">❚❚</button>
+        <button type="button" id="reelNextBtn" aria-label="Next photo">›</button>
+        <span class="slide-counter" id="slideCounter" aria-hidden="true">1 / 96</span>
+      </div>
+    </section>
+
+
+    <!-- 5. NINE REASONS (cards are created by script.js) -->
+    <section class="scene reasons-scene" id="reasons" data-scene="reasons">
+      <div class="scene-head">
+        <p class="eyebrow">Little things that make you special.</p>
+        <h2>Things I adore about you.</h2>
+      </div>
+
+      <div class="reason-grid" id="reasonGrid"></div>
+    </section>
+
+
+    <!-- 6. LOVE COUPONS (cards are created by script.js) -->
+    <section class="scene coupons-scene" id="coupons" data-scene="coupons">
+      <div class="scene-head">
+        <p class="eyebrow">Birthday treats.</p>
+        <h2>Birthday coupons.</h2>
+        <p>Tap a treat to redeem it.</p>
+      </div>
+
+      <div class="coupon-grid" id="couponGrid"></div>
+    </section>
+
+
+    <!-- 7. AARZU VIDEO -->
+    <section class="scene aarzu-scene" id="aarzu" data-scene="aarzu">
+      <div class="aarzu-wrap">
+        <div class="scene-head">
+          <p class="eyebrow">Aarzu edit.</p>
+          <h2>Ek filmy pause.</h2>
+          <p>Jahan words kam pad jaate hain, wahan thoda sa music bol deta hai.</p>
+        </div>
+
+        <div class="aarzu-frame">
+          <video id="aarzuVideo" controls preload="metadata" poster="gift/i17.png">
+            <source src="assets/aarzu-edit.mp4" type="video/mp4">
+          </video>
+          <div class="aarzu-caption">
+            <strong>Ananya, meri favourite birthday girl.</strong>
+            <span>Play this when you want a little filmy birthday pause.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 8. FINAL QUESTION, then the reveal after she says yes -->
+    <section class="scene finale-scene" id="finale" data-scene="finale">
+      <div class="final-question" id="finalQuestion">
+        <p class="eyebrow">One birthday surprise left.</p>
+        <h2>Ready for your birthday surprise?</h2>
+        <p>Ananya, meri Babbyy, meri jaan —<br>shall I open the last little surprise for you?</p>
+        <div class="answer-row">
+          <button class="primary" id="yesBtn" type="button">Yes, show me 🎂</button>
+          <button class="ghost" id="maybeBtn" type="button">Wait, I’m shy 😭</button>
+        </div>
+      </div>
+
+      <div class="reveal" id="finalReveal" hidden>
+        <p class="eyebrow">Meri Princess.</p>
+        <h2>HAPPY BIRTHDAY, ANANYA</h2>
+        <blockquote>
+          Na chaand maanga, na sitaron ka shehar,<br>
+          bas tum saath raho toh khoobsurat hai har pehar.<br>
+          Kal kya hoga, pata nahi...<br>
+          par meri favourite kahaani mein naam tumhara hi hai.
+        </blockquote>
+        <p class="reveal-hint">Tumhari birthday voice note bhi yahin hai ↘</p>
+      </div>
+    </section>
+
+
+    <!-- 9. VOICE NOTE (the last message appears after the audio ends) -->
+    <section class="scene voice-scene" id="voice" data-scene="voice">
+      <div class="voice-card" id="voiceCard">
+        <p class="eyebrow">A birthday message from Shreyash</p>
+        <h2>Your birthday voice note is saved for here. 🎙️</h2>
+        <audio id="voiceNote" controls preload="metadata"></audio>
+        <p class="asset-note" id="voiceStatus">Voice note coming soon — this space is ready for it. 🎙️❤️</p>
+
+        <div class="voice-after" id="voiceAfter" hidden>
+          <h3>Birthday girl... 🥹</h3>
+          <p>Ye birthday message tumhare liye hai.<br>Ab smile karna compulsory hai. 😭👉👈</p>
+          <p>Happy Birthday, meri jaan. ❤️</p>
+          <p>Bas ek simple si baat hai...</p>
+          <p>Tum meri favourite person ho,<br>aur aaj ka din tumhare naam hai.</p>
+          <p class="signature">- Tumhara Shreyash ♡</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ===== Pop-ups ===== -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close image">×</button>
+    <button class="lightbox-nav prev" id="lightboxPrev" type="button" aria-label="Previous image">‹</button>
+    <img id="lightboxImg" alt="Memory photo">
+    <button class="lightbox-nav next" id="lightboxNext" type="button" aria-label="Next image">›</button>
+    <p id="lightboxCaption"></p>
+  </div>
+
+
+  <!-- ===== Background music + code ===== -->
+  <audio id="bgm" preload="auto" loop src="assets/music.mp3"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
